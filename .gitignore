@@ -1,3 +1,5 @@
 *.exe
 *.o
 *.lib
+*.out
+*.old
