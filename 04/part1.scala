@@ -8,9 +8,11 @@ def findAllXMAS(grid: Array[String]): List[((Int, Int), (Int, Int))] =
     word match {
       case "" => true
       case word
-          if y < 0 || y >= grid.length || x < 0 || x >= grid(y).length || grid(
-            y
-          )(x) != word.head =>
+          if y < 0 ||
+            y >= grid.length ||
+            x < 0 ||
+            x >= grid(y).length ||
+            grid(y)(x) != word.head =>
         false
       case word => find((y + dy, x + dx), dir, word.tail)
     }
