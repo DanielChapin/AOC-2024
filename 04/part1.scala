@@ -34,10 +34,11 @@ def findAllXMAS(grid: Array[String]): List[((Int, Int), (Int, Int))] =
     .flatMap(index => dirs.filter(find(index, _, "XMAS")).map((index, _)))
     .toList
 
-def main(args: Array[String]): Unit =
+@main
+def part1(args: String*): Unit =
   val filepath = args match {
-    case Array()         => "./in.txt"
-    case Array(filepath) => filepath
+    case Seq()         => "./in.txt"
+    case Seq(filepath) => filepath
     case _ =>
       throw IllegalArgumentException("Expected either 1 or 0 arguments.")
   }
