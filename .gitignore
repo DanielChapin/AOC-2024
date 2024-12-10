@@ -3,3 +3,6 @@
 *.lib
 *.out
 *.old
+
+*/bin
+*/obj
