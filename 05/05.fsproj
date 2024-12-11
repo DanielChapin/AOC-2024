@@ -7,7 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Prog1.fsx" />
+    <!-- <Compile Include="Prog1.fsx" /> -->
+    <Compile Include="Prog2.fsx" />
   </ItemGroup>
 
 </Project>
