@@ -1,7 +1,8 @@
 // ===================================================== //
 // Please note this is a VERY incomplete implementation. //
-// There is no debugger or any insight into runtime      //
-// behavior. Use an online interpreter for visuals       //
+// There is no debugger or any (meaningful) insight into //
+// runtime behavior.                                     //
+// Use an online interpreter for visuals.                //
 // ===================================================== //
 
 #include "stdio.h"
@@ -13,8 +14,8 @@
 #define TAPE_OUTPUT 32
 #define ROW_LEN 8
 
-typedef long tape_cell;
-#define TAPE_CELL_FORMAT "%ld"
+typedef unsigned short tape_cell;
+#define TAPE_CELL_FORMAT "%hu"
 
 size_t jumpMatching(size_t instruction, char *prog, size_t progLen)
 {
@@ -46,7 +47,12 @@ size_t jumpMatching(size_t instruction, char *prog, size_t progLen)
         }
     }
 
-    return instruction + -dir;
+    if (instruction >= progLen)
+    {
+        fprintf(stderr, "[ERR] Failed to jump to matching bracket.\n");
+    }
+
+    return instruction;
 }
 
 int brainfuck(char *prog, size_t progLen, size_t tapeSize)
@@ -107,6 +113,10 @@ int brainfuck(char *prog, size_t progLen, size_t tapeSize)
             ++instruction;
             break;
         case '[':
+            // This isn't really in the scope of the project, but you could compute all of the jumps
+            // before execution and then just do a lookup instead of this linear algorithm.
+            // jumpMatching is O(n) where n is the program length.
+            // You could very easily make it O(1) because the program is constant.
             if (tape[pos] == 0)
             {
                 instruction = jumpMatching(instruction, prog, progLen);
