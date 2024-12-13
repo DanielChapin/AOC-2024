@@ -48,7 +48,7 @@ Main loop implementation
     1) Dollar sign
     First checking if *11 == '$'
     ------------------------------------ Subtract '$' from *11
-    >+<[>-<[+]]>    Convert *11 into its negated truthy value in *12
+    >+<[>-<[-]]>    Convert *11 into its negated truthy value in *12
     ~12
 
     If it is a $
@@ -62,39 +62,115 @@ Main loop implementation
     <<<<<<<     Goto continuation bit
     ~5
 
-    TODO This shit is just not correct; having some trouble figuring out how to have branching
-         expressions result in the pointer being on the same cell
     2) Space
-    [ If continuation bit is set
-        Checking for equality
-        >>>>>
+    Moving the continuation bit into the branching bit
+    [ - >>+<< ]
+    >>
+    [ If branching bit is set
+        [ - <<+>> ] Move the branching bit to the continuation bit
 
+        Checking for equality
+        >>>
         --------------------------------
         >+<[>-<[-]]>
         ~11
 
         If it is a space
         [
-            -           Zero the equality bit
+            [-]         Zero the equality bit
             <<<<<< [-]  Zero the continuation bit
+
+            Incrementing the input counter
+            > + <
 
             Shifting the number registers
             <<<< [-]        Zeroing first register
             > [ - < + > ]   Moving second register to first
             > [ - < + > ]   Moving number accumulator to second register
 
-            If we have more than one number for this group
-            check if the distance is within 2
+            TODO
+            At this point we know that we have a full number in the sequence
+            We need to check if the input counter is greater than 1
+            This determines whether or not we should check for the distance
+            1) If it is then we need to check if the distance between the two numbers is within 2
+                i)  If it is then this sequence is invalid and we need to skip to the next comma
+                ii) If it isn't then we continue
+            2) If it isn't then we continue
         ]
         ~11
         <<<<
         ~7
     ]
     <<  Goto continuation bit
+    ~5
 
     3) Comma
+    Moving the continuation bit into the branching bit
+    [ - >>+<< ]
+    >>
+    [
+        [ - <<+>> ]
 
-    4) Digit
+        Checking for equality
+        >>
+        -------------------------------------------- (subtract 44)
+        >+<[>-<[-]]>
+        ~10
+
+        If it is a comma
+        [
+            [-]         Zero the equality bit
+            <<<< [-]    Zero the input counter
+            < [-]       Zero the continuation bit
+
+            Zero all the numeric registers
+            << [-]
+            <  [-]
+            <  [-]
+            
+            Add one to the result register
+            < +
+            ~0
+
+            >>>>>>>>>>
+            ~10
+        ]
+
+        <<<     Goto branching bit
+    ]
+    <<      Goto continuation bit
+    ~5
+
+    4) Assume the char is a digit if the continuation bit is set
+    [ - >>+<< ]
+    >>
+    [
+        [ - <<+>> ]
+        
+        Converting to numeric value
+        >
+        ------------------------------------------------ (subtract 48)
+
+        Add *3 times 10 to cell
+        <<<<<
+        [ - >>>>> ++++++++++ <<<<< ]
+        >>>>>
+
+        Moving numeric value back to accumulator
+        [ - <<<<< + >>>>> ]
+
+        Go back to branching bit
+        <
+    ]
+    <<  Goto continuation bit
+
+    Cleanup
+    >>[-]
+    >[-]
+    >[-]
+    >[-]
+    >[-]
+    <<<<<<
 
     Before we need to go on to the next cycle
     <   Goto the computation bit
