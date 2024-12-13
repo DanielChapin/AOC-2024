@@ -8,17 +8,17 @@
 typedef std::pair<int, int> vec2;
 
 template <typename A, typename B>
-std::pair<A, B> addPair(std::pair<A, B> &l, std::pair<A, B> &r)
+std::pair<A, B> addPair(const std::pair<A, B> &l, const std::pair<A, B> &r)
 {
     return std::make_pair(l.first + r.first, l.second + r.second);
 }
 
-vec2 rotate(vec2 &vec)
+vec2 rotate(const vec2 &vec)
 {
     return std::make_pair(vec.second, -vec.first);
 }
 
-bool vecWithin(vec2 &pos, vec2 &dim)
+bool vecWithin(const vec2 &pos, const vec2 &dim)
 {
     return pos.first >= 0 && pos.second >= 0 && pos.first < dim.first && pos.second < dim.second;
 }
@@ -133,25 +133,63 @@ std::optional<Board> input(std::string &filepath)
     return result;
 }
 
-int uniquePositions(Board &board)
+std::pair<std::set<vec2>, bool> uniquePositions(const Board &board)
 {
+    // We can very simply detect a loop by checking if the guard has ever been
+    // in the exact current position and direction
+    std::set<std::pair<vec2, vec2>> seenStates;
     std::set<vec2> positions;
+    bool loop = false;
 
-    while (vecWithin(board.guardPos, board.dimensions))
+    vec2 pos = board.guardPos, dir = board.guardDir;
+
+    while (vecWithin(pos, board.dimensions))
     {
-        positions.emplace(board.guardPos);
+        std::pair<vec2, vec2> state(pos, dir);
+        if (seenStates.find(state) != seenStates.end())
+        {
+            loop = true;
+            break;
+        }
 
-        vec2 next = addPair(board.guardPos, board.guardDir);
+        seenStates.emplace(state);
+        positions.emplace(pos);
+
+        vec2 next = addPair(pos, dir);
         if (board.obstacles.find(next) != board.obstacles.end())
         {
-            board.guardDir = rotate(board.guardDir);
+            dir = rotate(dir);
             continue;
         }
 
-        board.guardPos = next;
+        pos = next;
     }
 
-    return positions.size();
+    return std::make_pair(positions, loop);
+}
+
+std::set<vec2> solution(Board &board)
+{
+    // Note here that we're assuming the guard won't start in a loop.
+    std::set<vec2> viablePlacements = uniquePositions(board).first;
+    viablePlacements.erase(board.guardPos);
+
+    std::set<vec2> goodPlacements;
+    for (vec2 placement : viablePlacements)
+    {
+        // Modifying the existing board to avoid cloning the whole thing
+        board.obstacles.emplace(placement);
+
+        bool isLoop = uniquePositions(board).second;
+        if (isLoop)
+        {
+            goodPlacements.emplace(placement);
+        }
+
+        board.obstacles.erase(placement);
+    }
+
+    return goodPlacements;
 }
 
 int main(int argc, char *argv[])
@@ -167,10 +205,12 @@ int main(int argc, char *argv[])
     {
         Board board = std::move(in.value());
         std::cout << board.visualize() << "\n";
-        auto result = uniquePositions(board);
-        std::cout
-            << "Guard steps on "
-            << result
-            << " distinct positions.\n";
+        auto result = solution(board);
+        std::cout << "The following positions put the guard in a loop:\n";
+        for (vec2 placement : result)
+        {
+            std::cout << placement.first << ", " << placement.second << "\n";
+        }
+        std::cout << "Total count: " << result.size() << "\n";
     }
 }
