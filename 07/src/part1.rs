@@ -2,20 +2,19 @@ use std::{
     env,
     fs::File,
     io::{self, BufRead, BufReader},
-    iter,
     path::Path,
 };
 
 use regex::Regex;
 
 #[derive(Debug)]
-struct Eqn {
+pub struct Eqn {
     pub lhs: i64,
     pub rhs: Vec<i64>,
 }
 
 #[derive(Debug)]
-enum InputErr {
+pub enum InputErr {
     ParseErr(String),
     IoErr(io::Error),
 }
@@ -57,7 +56,7 @@ fn input(path: &Path) -> Result<Vec<Eqn>, InputErr> {
         .collect()
 }
 
-fn input_from_cli() -> Result<Vec<Eqn>, InputErr> {
+pub fn input_from_cli() -> Result<Vec<Eqn>, InputErr> {
     let filepath = match &env::args().collect::<Vec<_>>()[..] {
         [_, filepath] => filepath.clone(),
         _ => String::from("in.txt"),
@@ -102,7 +101,7 @@ fn main() -> Result<(), InputErr> {
         })
         .sum::<i64>();
 
-    println!("Number of eqns with valid substitutions: {result}");
+    println!("Sum of lhs of eqns with substitutions: {result}");
 
     Ok(())
 }
