@@ -4,6 +4,10 @@
 *.out
 *.old
 
+*/target
+*.pdb
+Cargo.lock
+
 */bin
 */obj
 
