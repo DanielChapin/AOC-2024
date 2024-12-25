@@ -19,6 +19,8 @@ def get_antennas(lines: list[str]) -> dict[str, set[(int, int)]]:
     return antennas
 
 
+# I don't know why my linter doesn't catch this... but tuple types don't work liek this!
+# Reference part2.py
 def get_antinodes(antennas: set[(int, int)]) -> set[(int, int)]:
     # This worked for my part 1... but I'm a bit lost...
     # Is this not an antinode?
