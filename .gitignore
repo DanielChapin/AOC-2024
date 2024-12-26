@@ -12,3 +12,6 @@ Cargo.lock
 */obj
 
 .vscode
+
+# Odin
+ols.json
